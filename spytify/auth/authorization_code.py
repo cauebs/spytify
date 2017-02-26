@@ -6,12 +6,19 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 class AuthorizationCode:
 
-    def __init__(self, client_id, client_secret, redirect_uri, scope=[], token_saver=None):
+    def __init__(self, client_id, client_secret, redirect_uri,
+                 scope=None, token_saver=None):
+        scope = scope or []
         self.client_secret = client_secret
+
+        auto_refresh_kwargs = {
+            'client_id': client_id,
+            'client_secret': client_secret
+        }
+
         self.session = OAuth2Session(client_id, redirect_uri, scope,
                                      auto_refresh_url=TOKEN_URL,
-                                     auto_refresh_kwargs={'client_id': client_id,
-                                                          'client_secret': client_secret},
+                                     auto_refresh_kwargs=auto_refresh_kwargs,
                                      token_updater=token_saver)
 
     def fetch_auth_url(self):

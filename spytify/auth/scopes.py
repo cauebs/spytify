@@ -1,4 +1,7 @@
-# If no scope is specified, access is permitted only to publicly available information: that is, only information normally visible to normal logged-in users of the Spotify desktop, web, and mobile clients (e.g. public playlists).
+# If no scope is specified, access is permitted only to publicly available
+# information: that is, only information normally visible to normal logged-in
+# users of the Spotify desktop, web, and mobile clients
+# (e.g. public playlists).
 
 # Read access to user's private playlists.
 PLAYLIST_READ_PRIVATE = 'playlist-read-private'
@@ -12,10 +15,13 @@ PLAYLIST_MODIFY_PUBLIC = 'playlist-modify-public'
 # Write access to a user's private playlists.
 PLAYLIST_MODIFY_PRIVATE = 'playlist-modify-private'
 
-# Control playback of a Spotify track. This scope is currently only available to Spotify native SDKs (for example, the iOS SDK and the Android SDK). The user must have a Spotify Premium account.
+# Control playback of a Spotify track. This scope is currently only available
+# to Spotify native SDKs (for example, the iOS SDK and the Android SDK).
+# The user must have a Spotify Premium account.
 STREAMING = 'streaming'
 
-# Write/delete access to the list of artists and other users that the user follows.
+# Write/delete access to the list of artists and other users
+# that the user follows.
 USER_FOLLOW_MODIFY = 'user-follow-modify'
 
 # Read access to the list of artists and other users that the user follows.
