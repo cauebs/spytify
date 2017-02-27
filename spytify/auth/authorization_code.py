@@ -1,4 +1,6 @@
 from requests_oauthlib import OAuth2Session
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
 
 AUTH_URL = 'https://accounts.spotify.com/authorize'
 TOKEN_URL = 'https://accounts.spotify.com/api/token'
@@ -7,26 +9,53 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 class AuthorizationCode:
 
     def __init__(self, client_id, client_secret, redirect_uri,
-                 scope=None, token_saver=None):
-        scope = scope or []
+                 scope=(), token=None, token_saver=None):
         self.client_secret = client_secret
+        self.token_saver = token_saver or (lambda *args: None)
 
-        auto_refresh_kwargs = {
-            'client_id': client_id,
-            'client_secret': client_secret
-        }
+        auto_refresh_kwargs = {'client_id': client_id,
+                               'client_secret': client_secret}
 
-        self.session = OAuth2Session(client_id, redirect_uri, scope,
+        self.session = OAuth2Session(client_id=client_id,
+                                     redirect_uri=redirect_uri,
+                                     scope=scope,
                                      auto_refresh_url=TOKEN_URL,
                                      auto_refresh_kwargs=auto_refresh_kwargs,
-                                     token_updater=token_saver)
+                                     token=token,
+                                     token_updater=self.token_saver)
 
-    def fetch_auth_url(self):
-        url, state = self._session.authorization_url(AUTH_URL)
+    def auth_url(self):
+        url, state = self.session.authorization_url(AUTH_URL)
         return url
 
     def fetch_token(self, code):
-        token = self._session.fetch_token(TOKEN_URL,
-                                          code=code,
-                                          client_secret=self.client_secret)
+        token = self.session.fetch_token(TOKEN_URL,
+                                         code=code,
+                                         client_secret=self.client_secret)
         return token
+
+    def receive_code(self, port, final_redirect=None):
+        class RequestHandler(BaseHTTPRequestHandler):
+            def do_GET(self):
+                try:
+                    query = urlparse(self.path).query
+                    query = parse_qs(query)
+                    self.code = query['code'][0]
+                except Exception as e:
+                    self.send_response(500)
+                    self.code = None
+                else:
+                    if final_redirect:
+                        self.send_response(302)
+                        self.send_header("Location", final_redirect)
+                    else:
+                        self.send_response(200)
+                finally:
+                    self.end_headers()
+
+        client_address = ('localhost', port)
+        server = HTTPServer(client_address, RequestHandler)
+        request, client_address = server.get_request()
+        code = RequestHandler(request, client_address, server).code
+
+        return code
