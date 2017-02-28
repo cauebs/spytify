@@ -1,4 +1,5 @@
-from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import TokenExpiredError
+import requests
 from .model import Artist
 
 import re
@@ -20,10 +21,7 @@ class Spotify:
     API_URL = 'https://api.spotify.com/v1/'
 
     def __init__(self, auth=None):
-        if auth:
-            self._session = auth.session
-        else:
-            self._session = OAuth2Session()
+        self.auth = auth
 
     def _get(self, *endpoint, params=None, **kwargs):
         kwargs.update(params or {})
@@ -31,11 +29,17 @@ class Spotify:
         if isinstance(endpoint, tuple):
             endpoint = '/'.join(endpoint)
 
-        return self._session.get(self.API_URL + endpoint).json()
+        if self.auth:
+            try:
+                response = self.auth.session.get(self.API_URL + endpoint)
+            except TokenExpiredError:
+                self.auth.refresh_token()
+                response = self.auth.session.get(self.API_URL + endpoint)
 
-    def test(self):
-        return self._session.get(
-            'https://api.spotify.com/v1/audio-features/06AKEBrKUckW0KREUWRnvT')
+        else:
+            response = requests.get(self.API_URL + endpoint)
+
+        return response.json()
 
     def track(self, track_id):
         return self._get('tracks', clean_uri(track_id))

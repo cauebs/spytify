@@ -8,18 +8,21 @@ TOKEN_URL = 'https://accounts.spotify.com/api/token'
 
 class AuthorizationCode:
 
-    def __init__(self, client_id, client_secret, token=None, token_saver=None):
+    def __init__(self, client_id, client_secret, token=None,
+                 auto_refresh=True, token_saver=None):
+        self.client_id = client_id
         self.client_secret = client_secret
         self.token_saver = token_saver or (lambda *args: None)
 
-        auto_refresh_kwargs = {'client_id': client_id,
-                               'client_secret': client_secret}
+        refresh_url = TOKEN_URL if auto_refresh else None
+        extra = {'client_id': client_id,
+                 'client_secret': client_secret}
 
-        self.session = OAuth2Session(client_id=client_id,
-                                     auto_refresh_url=TOKEN_URL,
-                                     auto_refresh_kwargs=auto_refresh_kwargs,
-                                     token=token,
-                                     token_updater=self.token_saver)
+        self.session = OAuth2Session(token=token,
+                                     client_id=self.client_id,
+                                     token_updater=self.token_saver,
+                                     auto_refresh_url=refresh_url,
+                                     auto_refresh_kwargs=extra)
 
     def auth_url(self, redirect_uri, scope=()):
         self.session.redirect_uri = redirect_uri
@@ -32,6 +35,12 @@ class AuthorizationCode:
                                          code=code,
                                          client_secret=self.client_secret)
         self.token_saver(token)
+        return token
+
+    def refresh_token(self):
+        token = self.session.refresh_token(TOKEN_URL,
+                                           client_id=self.client_id,
+                                           client_secret=self.client_secret)
         return token
 
     def receive_code(self, port, final_redirect=None):
