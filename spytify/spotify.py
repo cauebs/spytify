@@ -19,15 +19,11 @@ class Spotify:
 
     API_URL = 'https://api.spotify.com/v1/'
 
-    def __init__(self, authorization_code=None,
-                 client_credentials=None, session=None):
-        if authorization_code:
-            pass
-        elif client_credentials:
-            client_credentials.fetch_token()
-            self._session = client_credentials.session
+    def __init__(self, auth=None):
+        if auth:
+            self._session = auth.session
         else:
-            self._session = session or OAuth2Session()
+            self._session = OAuth2Session()
 
     def _get(self, *endpoint, params=None, **kwargs):
         kwargs.update(params or {})

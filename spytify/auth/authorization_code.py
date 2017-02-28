@@ -31,6 +31,7 @@ class AuthorizationCode:
         token = self.session.fetch_token(TOKEN_URL,
                                          code=code,
                                          client_secret=self.client_secret)
+        self.token_saver(token)
         return token
 
     def receive_code(self, port, final_redirect=None):
@@ -52,8 +53,8 @@ class AuthorizationCode:
                 finally:
                     self.end_headers()
 
-        client_address = ('localhost', port)
-        server = HTTPServer(client_address, RequestHandler)
+        address = ('localhost', port)
+        server = HTTPServer(address, RequestHandler)
         request, client_address = server.get_request()
         code = RequestHandler(request, client_address, server).code
 
