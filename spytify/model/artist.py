@@ -1,8 +1,4 @@
-from collections import namedtuple
-
-
-class CoverArt(namedtuple('CoverArt', 'height width url')):
-    pass
+from .utils import Image
 
 
 class Artist:
@@ -19,11 +15,15 @@ class Artist:
 
         self._genres = json.get('genres')
         self._popularity = json.get('popularity')
-        self._followers = json.get('followers').get('total')
 
-        if 'images' in json:
-            self._images = [CoverArt(**image) for image in json['images']]
-        else:
+        try:
+            self._followers = json['followers']['total']
+        except KeyError:
+            self._followers = None
+
+        try:
+            self._images = tuple(Image(**image) for image in json['images'])
+        except KeyError:
             self._images = None
 
     def _load(self):
@@ -74,3 +74,7 @@ class Artist:
             self._load()
 
         return self._images
+
+    def __str__(self):
+        return '<{} object: name={}, uri={}>'.format(
+            self.__class__.__name__, self.name, self.uri)
