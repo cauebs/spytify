@@ -1,0 +1,64 @@
+from utils import create_spotify
+from datetime import timedelta
+
+spy = create_spotify()
+
+dict_sos = {
+    'uri': 'spotify:track:2c6BNK8IQjsFdUznUBDe4N',
+    'name': 'S.O.S.',
+    'id': '2c6BNK8IQjsFdUznUBDe4N',
+    'url': 'https://open.spotify.com/track/2c6BNK8IQjsFdUznUBDe4N',
+    'explicit': False,
+    'preview_url': ('https://p.scdn.co/mp3-preview/'
+                    '4a6e1456e04690cac4cafe1687f45bef82757d4a?'
+                    'cid=25de06ef6f834089becebb79784028e4'),
+    'duration': timedelta(milliseconds=205466),
+}
+
+dict_cola = {
+    'uri': 'spotify:track:29ryZ3PkPU9SKe3ZAIwnrJ',
+    'name': 'Cola',
+    'id': '29ryZ3PkPU9SKe3ZAIwnrJ',
+    'url': 'https://open.spotify.com/track/29ryZ3PkPU9SKe3ZAIwnrJ',
+    'explicit': True,
+    'preview_url': ('https://p.scdn.co/mp3-preview/'
+                    '218ad874f3b20f343c10cc44e0ae2765c3968b4a?'
+                    'cid=25de06ef6f834089becebb79784028e4'),
+    'duration': timedelta(milliseconds=260893),
+}
+
+track_uris = [
+    'spotify:track:5cY8y2XgOfkAh4kSWLFKkz',
+    'spotify:track:4zjFqN9fXAw91GNgJOCYX6',
+    'spotify:track:6SpLc7EXZIPpy0sVko0aoU',
+    'spotify:track:3WotBmwJH3eVPf1Wy2Y2IC',
+    'spotify:track:0pKrMTlDlW54abYkdBsgxj',
+]
+
+
+def test_sos():
+    sos = spy.track(dict_sos['uri'])
+
+    for key, value in dict_sos.items():
+        assert getattr(sos, key) == value
+
+    assert str(sos) == ('<Track object: name=S.O.S., '
+                        'uri=spotify:track:2c6BNK8IQjsFdUznUBDe4N>')
+
+    assert sos.artist == spy.artist('spotify:artist:0LcJLqbBmaGUft1e9Mm8HV')
+
+
+def test_cola():
+    cola = spy.track(dict_cola['uri'])
+
+    for key, value in dict_cola.items():
+        assert getattr(cola, key) == value
+
+    assert str(cola) == ('<Track object: name=Cola, '
+                         'uri=spotify:track:29ryZ3PkPU9SKe3ZAIwnrJ>')
+
+    assert cola.artist == spy.artist('spotify:artist:00FQb4jTyendYWaN8pK0wa')
+
+
+def test_tracks():
+    assert spy.tracks(track_uris) == [spy.track(uri) for uri in track_uris]

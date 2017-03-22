@@ -13,7 +13,7 @@ def clean_uri(uri):
     try:
         return match.groups()
     except AttributeError:
-        return uri
+        return (None, uri)
 
 
 def uri_type(uri):
@@ -24,6 +24,10 @@ def uri_id(uri):
     return clean_uri(uri)[1]
 
 
+def ids_to_parameter(ids):
+    return ','.join([uri_id(i) for i in ids])
+
+
 class Spotify:
 
     API_URL = 'https://api.spotify.com/v1/'
@@ -31,22 +35,22 @@ class Spotify:
     def __init__(self, auth=None):
         self.auth = auth
 
-    def _get(self, *endpoint, params=None, **kwargs):
+    def _get(self, *endpoint, params=None):
         print('CALLED', endpoint)
-
-        kwargs.update(params or {})
 
         endpoint = '/'.join(endpoint)
 
         if self.auth:
             try:
-                response = self.auth.session.get(self.API_URL + endpoint)
+                response = self.auth.session.get(
+                    self.API_URL + endpoint, params=params)
             except TokenExpiredError:
                 self.auth.refresh_token()
-                response = self.auth.session.get(self.API_URL + endpoint)
+                response = self.auth.session.get(
+                    self.API_URL + endpoint, params=params)
 
         else:
-            response = requests.get(self.API_URL + endpoint)
+            response = requests.get(self.API_URL + endpoint, params=params)
 
         return response.json()
 
@@ -61,3 +65,10 @@ class Spotify:
     def album(self, album_id):
         json = self._get('albums', uri_id(album_id))
         return Album(json, spy=self)
+
+    def tracks(self, track_ids):
+        track_ids = ids_to_parameter(track_ids)
+
+        json = self._get('tracks', params=dict(ids=track_ids))
+
+        return [Track(track, spy=self) for track in json['tracks']]

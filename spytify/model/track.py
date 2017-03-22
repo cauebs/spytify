@@ -24,8 +24,7 @@ class Track:
         self._artists = tuple(Artist(artist, spy=self._spy)
                               for artist in json['artists'])
 
-        self._album = tuple(Album(album, spy=self._spy)
-                            for album in json['albuns'])
+        self._album = Album(json['album'], spy=self)
 
         self._popularity = json.get('popularity')
 
@@ -92,3 +91,8 @@ class Track:
     def __str__(self):
         return '<{} object: name={}, uri={}>'.format(
             self.__class__.__name__, self.name, self.uri)
+
+    def __eq__(self, other):
+        if isinstance(other, Track):
+            return self.uri == other.uri
+        return NotImplemented
