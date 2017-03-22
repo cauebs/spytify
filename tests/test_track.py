@@ -4,27 +4,45 @@ from datetime import timedelta
 spy = create_spotify()
 
 dict_sos = {
-    'uri': 'spotify:track:2c6BNK8IQjsFdUznUBDe4N',
-    'name': 'S.O.S.',
-    'id': '2c6BNK8IQjsFdUznUBDe4N',
-    'url': 'https://open.spotify.com/track/2c6BNK8IQjsFdUznUBDe4N',
+    'disc_number': 1,
+    'duration': timedelta(milliseconds=205466),
     'explicit': False,
+    'id': '2c6BNK8IQjsFdUznUBDe4N',
+    'name': 'S.O.S.',
     'preview_url': ('https://p.scdn.co/mp3-preview/'
                     '4a6e1456e04690cac4cafe1687f45bef82757d4a?'
                     'cid=25de06ef6f834089becebb79784028e4'),
-    'duration': timedelta(milliseconds=205466),
+    'track_number': 4,
+    'uri': 'spotify:track:2c6BNK8IQjsFdUznUBDe4N',
+    'url': 'https://open.spotify.com/track/2c6BNK8IQjsFdUznUBDe4N',
 }
 
 dict_cola = {
-    'uri': 'spotify:track:29ryZ3PkPU9SKe3ZAIwnrJ',
-    'name': 'Cola',
-    'id': '29ryZ3PkPU9SKe3ZAIwnrJ',
-    'url': 'https://open.spotify.com/track/29ryZ3PkPU9SKe3ZAIwnrJ',
+    'disc_number': 1,
+    'duration': timedelta(milliseconds=260893),
     'explicit': True,
+    'id': '29ryZ3PkPU9SKe3ZAIwnrJ',
+    'name': 'Cola',
     'preview_url': ('https://p.scdn.co/mp3-preview/'
                     '218ad874f3b20f343c10cc44e0ae2765c3968b4a?'
                     'cid=25de06ef6f834089becebb79784028e4'),
-    'duration': timedelta(milliseconds=260893),
+    'track_number': 3,
+    'uri': 'spotify:track:29ryZ3PkPU9SKe3ZAIwnrJ',
+    'url': 'https://open.spotify.com/track/29ryZ3PkPU9SKe3ZAIwnrJ',
+}
+
+dict_telephone = {
+    'disc_number': 1,
+    'duration': timedelta(milliseconds=220626),
+    'explicit': False,
+    'id': '00BuKLSAFkaEkaVAgIMbeA',
+    'name': 'Telephone',
+    'preview_url': ('https://p.scdn.co/mp3-preview/'
+                    'b440f5b990275459fdad0a3fc726046100cdf365?'
+                    'cid=25de06ef6f834089becebb79784028e4'),
+    'track_number': 6,
+    'uri': 'spotify:track:00BuKLSAFkaEkaVAgIMbeA',
+    'url': 'https://open.spotify.com/track/00BuKLSAFkaEkaVAgIMbeA',
 }
 
 track_uris = [
@@ -58,6 +76,22 @@ def test_cola():
                          'uri=spotify:track:29ryZ3PkPU9SKe3ZAIwnrJ>')
 
     assert cola.artist == spy.artist('spotify:artist:00FQb4jTyendYWaN8pK0wa')
+
+
+def test_telephone():
+    telephone = spy.track(dict_telephone['uri'])
+
+    for key, value in dict_telephone.items():
+        assert getattr(telephone, key) == value
+
+    assert str(telephone) == ('<Track object: name=Telephone, '
+                              'uri=spotify:track:00BuKLSAFkaEkaVAgIMbeA>')
+
+    lady_gaga = spy.artist('1HY2Jd0NmPuamShAr6KMms')
+    beyonce = spy.artist('6vWDO969PvNqNYHIOW5v0m')
+
+    assert telephone.artist == lady_gaga
+    assert telephone.artists == (lady_gaga, beyonce)
 
 
 def test_tracks():
