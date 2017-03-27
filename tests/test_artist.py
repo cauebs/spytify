@@ -62,7 +62,6 @@ def test_abba():
         assert getattr(abba, key) == value
 
     for dict_img, obj_img in zip(imgs_abba, abba.images):
-        print(dict_img, obj_img)
         assert obj_img.width == dict_img['width']
         assert obj_img.height == dict_img['height']
         assert obj_img.url == dict_img['url']
@@ -75,7 +74,6 @@ def test_panic():
         assert getattr(panic, key) == value
 
     for dict_img, obj_img in zip(imgs_panic, panic.images):
-        print(dict_img, obj_img)
         assert obj_img.width == dict_img['width']
         assert obj_img.height == dict_img['height']
         assert obj_img.url == dict_img['url']

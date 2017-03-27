@@ -112,3 +112,8 @@ class Album:
     def __str__(self):
         return '<{} object: name={}, uri={}>'.format(
             self.__class__.__name__, self.name, self.uri)
+
+    def __eq__(self, other):
+        if isinstance(other, Album):
+            return self.uri == other.uri
+        return NotImplemented

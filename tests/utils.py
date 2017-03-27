@@ -1,3 +1,4 @@
+import json
 import sys
 sys.path.append('..')
 
@@ -5,9 +6,15 @@ from spytify import Spotify
 from spytify import AuthorizationCode, ClientCredentials
 
 
-CLIENT_ID = '25de06ef6f834089becebb79784028e4'
-CLIENT_SECRET = '2bf0aa15bd3d4691bf9406e0efb13909'
+def load_config():
+    with open('config.json') as config_file:
+        return json.loads(config_file.read())
 
 
 def create_spotify():
-    return Spotify(auth=ClientCredentials(CLIENT_ID, CLIENT_SECRET))
+    config = load_config()
+    auth = ClientCredentials(config['client_id'], config['client_secret'])
+    return Spotify(auth=auth)
+
+
+print(load_config())
